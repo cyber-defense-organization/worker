@@ -6,9 +6,9 @@ var teamSchema = new Schema({
      score: Number,
      services: 
           [{
-               linuxICMP: [{
+               ICMP: [{
                     timeStamp: Number,
-                    value: Boolean
+                    status: Boolean //Future add up and down
                }],
                
           }]

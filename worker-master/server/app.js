@@ -58,14 +58,70 @@ var config = { url: 'ldap://dc.domain.com',
                password: 'password' } //might not need these
 var ad = new ActiveDirectory(config);
 
-// const mongodb_conn_module = require('./mongodbConnModule');
-// var db = mongodb_conn_module.connect();
+const mongodb_conn_module = require('./mongodbConnModule');
+var db = mongodb_conn_module.connect();
 
 //dbdepends
 var Team = require("./models/team")
 
 //middleware if we get that far
 // const ICMP = require('./middleware/ICMP')
+
+app.get('/addTeam/:name' , (req,res,next) => {
+    var epochTime = Date.now();
+    var name = req.params.name;
+    var score = 0;
+    var isOnline = true;
+    var new_entry = new Team({
+        name: name,
+           score: score,
+           services: 
+                [{
+                     ICMP: [{
+                          timeStamp: epochTime,
+                          status: isOnline
+                     }],
+                     
+                }]
+      })
+      
+      new_entry.save(function (error) {
+        if (error) {
+          console.log(error)
+        }
+        res.send({
+          success: true
+        })
+      })
+})
+
+app.get('/addICMP/:status/:name' , (req,res,next) => {
+    var curSta = req.params.status;
+    var epochTime = Date.now();
+    var name = req.params.name;
+    var isOnline = true;
+    //var icmpUpdate = { timeStamp: epochTime, status: isOnline };
+    // Team.services.push(icmpUpdate);
+    // Team.save(done);
+    Team.findOneAndUpdate(
+    { name: name }, 
+    //{$push: { services:[{ ICMP: [{ timeStamp: epochTime, status: isOnline}] }] }},
+    {$push: {'services.0.ICMP':{ timeStamp: epochTime, status: isOnline} }},
+    // { $push: { 'services.0.ICMP.0': icmpUpdate}},
+    function (error, success) {
+            if (error) {
+                console.log(error);
+                res.send({
+                    error: error
+                })
+            } else {
+                console.log(success);
+                res.send({
+                    success: success
+                })
+            }
+        });
+})
 
 app.get('/ICMP/:host', async (req, res, next) => {
     var hostIn = req.params.host;
