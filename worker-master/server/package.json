@@ -4,8 +4,20 @@
   "description": "backend worker for tracking services",
   "main": "app.js",
   "scripts": {
+    "start": "nodemon app.js --ignore '*.json'",
     "test": "node app.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "net-ping": "^1.2.3",
+    "body-parser": "^1.18.1",
+    "cors": "^2.8.4",
+    "express-ip": "^1.0.3",
+    "express-router": "0.0.1",
+    "mongoose": "^5.7.11",
+    "morgan": "^1.8.2",
+    "nodemon": "^1.12.1"
+  }
 }
