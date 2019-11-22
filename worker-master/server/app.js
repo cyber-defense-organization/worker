@@ -21,13 +21,42 @@ var options = {
     ttl: 128
 };
 var session = ping.createSession (options);
-
 //DNS
 
 //SSH
 var node_ssh = require('node-ssh')
 var ssh = new node_ssh()
-//
+//DB -- SQL
+//require the module
+var sql = require('sql');
+ 
+//(optionally) set the SQL dialect
+sql.setDialect('postgres');
+//possible dialects: mssql, mysql, postgres (default), sqlite
+var user = sql.define({
+    name: 'user',
+    columns: ['id', 'name', 'email', 'lastLogin']
+  });
+//FTP
+var Client = require('ftp');
+ 
+var c = new Client();
+c.on('ready', function() {
+c.list(function(err, list) {
+    if (err) throw err;
+    console.dir(list);
+    c.end();
+    });
+});
+//WinRM
+var winrm = require('nodejs-winrm');
+//AD (active directory) //doesnt work
+var ActiveDirectory = require('activedirectory');
+var config = { url: 'ldap://dc.domain.com',
+               baseDN: 'dc=domain,dc=com',
+               username: 'username@domain.com',// might not need these
+               password: 'password' } //might not need these
+var ad = new ActiveDirectory(config);
 
 // const mongodb_conn_module = require('./mongodbConnModule');
 // var db = mongodb_conn_module.connect();
@@ -38,10 +67,10 @@ var Team = require("./models/team")
 //middleware if we get that far
 // const ICMP = require('./middleware/ICMP')
 
-app.get('/ICMP/:ipIn', async (req, res, next) => {
-    var ipIn = req.params.ipIn;
+app.get('/ICMP/:host', async (req, res, next) => {
+    var hostIn = req.params.host;
     // console.log('ipAddr = ' + ipIn)
-    var target = ipIn;
+    var target = hostIn;
   
     const result = await session.pingHost(target, function (error, target, sent, rcvd) {
         var ms = rcvd - sent;
@@ -91,33 +120,90 @@ app.get('/SSH/:host/:port/:username/:password/:command', (req,res,next) => {
                     status: 'Nah B no ssh'
                 })
               });
+})
 
-    // console.log(hostIn + ' : ' +  usernameIn + ' : ' + passwordIn)
-    // try {
-    //     ssh.connect({
-    //         host: hostIn,
-    //         username: usernameIn,
-    //         port: portIn,
-    //         password: passwordIn,
-    //     }).then(function() {
-    //         ssh.execCommand('ls', { cwd:'' }).then(function(result) {
-    //             // console.log('STDOUT: ' + result.stdout)
-    //             // console.log('STDERR: ' + result.stderr)
-    //             res.send({
-    //                 status: result.stdout
-    //             })
-    //         })
-    //     })
+app.get('/FTP/:host/:port/:username/:password', (req , res , next) => {
+    var hostIn = req.params.host;
+    var portIn = req.params.port;
+    var usernameIn = req.params.username;
+    var passwordIn = req.params.password;
+    //var commandIn = req.params.command; //add this
+    c.connect({
+        host: hostIn,
+        port: portIn,
+        user: usernameIn,
+        pass: passwordIn
+    });
+})
 
-    // }
-    // catch(error) {
-    //     console.log("meme: " + error);
-    //     res.send({
-    //         status: 'Nah b'
-    //     })
-    // }
-    })
+app.get('/SQL/:host/:port/:username/:password', (req , res , next) => {
+    var hostIn = req.params.host;
+    var portIn = req.params.port;
+    var usernameIn = req.params.username;
+    var passwordIn = req.params.password;
+    //var commandIn = req.params.command; //add this
+    var query = user.select(user.star()).from(user).toQuery();
+    console.log(query.text); //SELECT "user".* FROM "user"
+})
 
+app.get('/WINRM/:host/:port/:username/:password', async (req , res , next) => {
+    var hostIn = req.params.host;
+    var portIn = req.params.port;
+    var usernameIn = req.params.username;
+    var passwordIn = req.params.password;
+    //var commandIn = req.params.command; //add this
+    var userName = usernameIn;
+    var password = passwordIn;
+    var _host = hostIn;
+    var _port = portIn;
+
+    var auth = 'Basic' + Buffer.from(userName + ":" + password, 'utf8').toString('base64');
+    var params = {
+        host: _host,
+        port: _port,
+        path: '/wsman' //This might not be needed
+    };
+    params['auth'] = auth;
+
+    //Get the Shell ID
+    params['shellId']= await winrm.shell.doCreateShell(params);
+
+    // Execute Command1
+    params['command'] = 'ipaddress /all';
+    params['commandId'] = await winrm.command.doExecuteCommand(params);
+    var result1= await winrm.command.doReceiveOutput(params);
+
+    // Execute Command2
+    params['command'] = 'mkdir D:\\winrmtest001';
+    params['commandId'] = await winrm.command.doExecuteCommand(params);
+    var result2= await winrm.command.doReceiveOutput(params);
+
+    // Close the Shell
+    await winrm.shell.doDeleteShell(params);
+})  
+
+app.get('/AD/:host/:port/:username/:password', async (req , res , next) => {
+    var hostIn = req.params.host;
+    var portIn = req.params.port;
+    var usernameIn = req.params.username;
+    var passwordIn = req.params.password;
+    //var commandIn = req.params.command; //add this
+    var username = usernameIn;
+    var password = passwordIn;
     
+    ad.authenticate(username, password, function(err, auth) {
+    if (err) {
+        console.log('ERROR: '+JSON.stringify(err));
+        return;
+    }
+    
+    if (auth) {
+        console.log('Authenticated!');
+    }
+    else {
+        console.log('Authentication failed!');
+    }
+    });
+})  
 
 app.listen(process.env.PORT || 8081)
