@@ -16,28 +16,20 @@ var Team = require("./models/team")
 
 console.log('Hello');
 
-var ping = require ("net-ping");
+const ICMP = require('./middleware/ICMP')
 
-// Default options
-var options = {
-    networkProtocol: ping.NetworkProtocol.IPv4,
-    packetSize: 16,
-    retries: 1,
-    sessionId: (process.pid % 65535),
-    timeout: 2000,
-    ttl: 128
-};
+var tIn = '8.8.8.8'
 
-var session = ping.createSession (options);
+app.use('/test', (req, res, next) => {
+    var test = ICMP.ICMP_CHECK(tIn)
+    res.send({
+        out: test
+    })
+})
 
+var test = ICMP.ICMP_CHECK(tIn)
 
+console.log('working');
+console.log(test);
 
-var target = "8.8.8.8";
-
-session.pingHost (target, function (error, target, sent, rcvd) {
-    var ms = rcvd - sent;
-    if (error)
-        console.log (target + ": " + error.toString ());
-    else
-        console.log (target + ": Alive (ms=" + ms + ")");
-});
+app.listen(process.env.PORT || 8081)

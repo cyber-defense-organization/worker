@@ -12,22 +12,25 @@ var options = {
 
 var session = ping.createSession (options);
 
-
-
-var target = "8.8.8.8";
-
-session.pingHost (target, function (error, target, sent, rcvd) {
-    var ms = rcvd - sent;
-    if (error)
-        console.log (target + ": " + error.toString ());
-    else
-        console.log (target + ": Alive (ms=" + ms + ")");
-});
-
 module.exports = {
 
-    ICMP_CHECK: function(){
-        return 
+    ICMP_CHECK: function(ipIn){
+        console.log('running...')
+        console.log(ipIn)
+        var target = ipIn;
+        var output = '';
+        session.pingHost (target, function (error, target, sent, rcvd) {
+            var ms = rcvd - sent;
+            if (error)
+                output = target.toString() +  ": " + error.toString ();
+                // console.log (target + ": " + error.toString ());
+            else
+                output = target.toString() +  ": Alive (ms=" + ms.toString() + ")";
+                //console.log (target + ": Alive (ms=" + ms + ")");
+        });
+        console.log('still running...')
+        console.log(output + "<-- Output")
+        return output;
     }
 
     // authorize: function(credentials, callback) {
