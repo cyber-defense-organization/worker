@@ -10,14 +10,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
-    "net-ping": "^1.2.3",
     "body-parser": "^1.18.1",
     "cors": "^2.8.4",
+    "express": "^4.17.1",
     "express-ip": "^1.0.3",
     "express-router": "0.0.1",
     "mongoose": "^5.7.11",
     "morgan": "^1.8.2",
+    "net-ping": "^1.2.3",
+    "node-ssh": "^6.0.0",
     "nodemon": "^1.12.1"
   }
 }
