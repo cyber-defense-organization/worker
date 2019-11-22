@@ -1,0 +1,11 @@
+{
+  "name": "worker",
+  "version": "1.0.0",
+  "description": "backend worker for tracking services",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
