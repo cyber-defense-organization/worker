@@ -285,3 +285,31 @@ app.get('/WINRM/:host/:port/:username/:password', async (req , res , next) => {
 
 //WinRM
 var winrm = require('nodejs-winrm');
+
+app.get('/SSH/:host/:port/:username/:password/:command', (req,res,next) => {
+    var hostIn = req.params.host;
+    var portIn = req.params.port;
+    var usernameIn = req.params.username;
+    var passwordIn = req.params.password;
+    var commandIn = req.params.command;
+
+    ssh.connect({
+                host: hostIn,
+                username: usernameIn,
+                port: portIn,
+                password: passwordIn,
+            }).then(function() {
+                ssh.execCommand(commandIn, { cwd:'' }).then(function(result) {
+                    // console.log('STDOUT: ' + result.stdout)
+                    // console.log('STDERR: ' + result.stderr)
+                    res.send({
+                        status: result.stdout
+                    })
+                })
+            }).catch(function(error) {
+                console.error(error);
+                res.send({
+                    status: 'Nah B no ssh'
+                })
+              });
+})

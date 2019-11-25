@@ -52,29 +52,11 @@ var dns = require('dns');
 var node_ssh = require('node-ssh')
 var ssh = new node_ssh()
 //DB -- SQL
-
-//require the module
-var sql = require('sql');
- 
-//(optionally) set the SQL dialect
-sql.setDialect('postgres');
-//possible dialects: mssql, mysql, postgres (default), sqlite
-var user = sql.define({
-    name: 'user',
-    columns: ['id', 'name', 'email', 'lastLogin']
-  });
+// npm install mysql
 
 //FTP
 var Client = require('ftp');
- 
 var c = new Client();
-c.on('ready', function() {
-c.list(function(err, list) {
-    if (err) throw err;
-    console.dir(list);
-    c.end();
-    });
-});
 
 //AD (active directory) //doesnt work
 var ActiveDirectory = require('activedirectory');
@@ -93,6 +75,7 @@ var Team = require("./models/team")
 //middleware if we get that far
 // const ICMP = require('./middleware/ICMP')
 
+//This will get added to admin panel on Backend
 app.get('/addTeam/:name' , (req,res,next) => {
     var epochTime = Date.now();
     var name = req.params.name;
@@ -271,59 +254,43 @@ app.get('/DNS_ALL/:teamName' , async (req, res, next) => {
         msg: 'DNS works'
     })
 })
-
-app.get('/SSH/:host/:port/:username/:password/:command', (req,res,next) => {
-    var hostIn = req.params.host;
-    var portIn = req.params.port;
-    var usernameIn = req.params.username;
-    var passwordIn = req.params.password;
-    var commandIn = req.params.command;
-
-    ssh.connect({
-                host: hostIn,
-                username: usernameIn,
-                port: portIn,
-                password: passwordIn,
-            }).then(function() {
-                ssh.execCommand(commandIn, { cwd:'' }).then(function(result) {
-                    // console.log('STDOUT: ' + result.stdout)
-                    // console.log('STDERR: ' + result.stderr)
-                    res.send({
-                        status: result.stdout
-                    })
-                })
-            }).catch(function(error) {
-                console.error(error);
-                res.send({
-                    status: 'Nah B no ssh'
-                })
-              });
-})
-
+//works
 app.get('/FTP/:host/:port/:username/:password', (req , res , next) => {
     var hostIn = req.params.host;
     var portIn = req.params.port;
     var usernameIn = req.params.username;
     var passwordIn = req.params.password;
-    //var commandIn = req.params.command; //add this
+    var commandIn = req.params.command; //add this
+    console.log(hostIn + " : " + portIn + " : " + usernameIn + " : " + passwordIn)
     c.connect({
         host: hostIn,
         port: portIn,
         user: usernameIn,
-        pass: passwordIn
+        password: 'bb123#123'
     });
+    c.on('ready', function() {
+        c.list(function(err, list) {
+            if (err){
+                console.log(err)
+            };
+            //console.dir(list);
+            console.log(list)
+            c.end();
+            });
+        });
+    res.send({
+        msg: 'FTP Noise'
+    })
 })
-
+//shouldnt be hard
 app.get('/SQL/:host/:port/:username/:password', (req , res , next) => {
     var hostIn = req.params.host;
     var portIn = req.params.port;
     var usernameIn = req.params.username;
     var passwordIn = req.params.password;
-    //var commandIn = req.params.command; //add this
-    var query = user.select(user.star()).from(user).toQuery();
-    console.log(query.text); //SELECT "user".* FROM "user"
-})
 
+})
+//No clue find liam
 app.get('/AD/:host/:port/:username/:password', async (req , res , next) => {
     var hostIn = req.params.host;
     var portIn = req.params.port;
