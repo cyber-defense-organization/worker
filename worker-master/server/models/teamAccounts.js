@@ -7,5 +7,5 @@ var teamAccountsSchema = new Schema({
      created_at: { type: Date, default: Date.now }
 });
 
-var teamAccounts = mongoose.model("team", teamAccountsSchema);
+var teamAccounts = mongoose.model("teamAccounts", teamAccountsSchema);
 module.exports = teamAccounts;
