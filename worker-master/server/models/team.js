@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 var teamSchema = new Schema({
      name: String,
+     password: String,
      score: Number,
      ICMP_Score: Number,
      SSH_Score: Number,
