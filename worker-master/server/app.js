@@ -2,7 +2,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const morgan = require('morgan')
-
+var Request = require("request");
+var mysql = require('mysql');
+var ActiveDirectory = require('activedirectory');
 const app = express()
 app.use(morgan('combined'))
 app.use(bodyParser.json())
@@ -254,65 +256,218 @@ app.get('/DNS_ALL/:teamName' , async (req, res, next) => {
         msg: 'DNS works'
     })
 })
-//works
-app.get('/FTP/:host/:port/:username/:password', (req , res , next) => {
-    var hostIn = req.params.host;
-    var portIn = req.params.port;
-    var usernameIn = req.params.username;
-    var passwordIn = req.params.password;
-    var commandIn = req.params.command; //add this
-    console.log(hostIn + " : " + portIn + " : " + usernameIn + " : " + passwordIn)
-    c.connect({
-        host: hostIn,
-        port: portIn,
-        user: usernameIn,
-        password: 'bb123#123'
-    });
-    c.on('ready', function() {
-        c.list(function(err, list) {
+
+app.get('/SQL_ALL/:teamName' , async (req, res, next) => {
+    var name = req.params.teamName;
+    var epochTime = Date.now();
+
+    for (let index = 0; index < teamIps.length; index++) {
+        var hostIn = teamIps[index];
+        const boxName = boxNames[index];
+        var db_base = 'services.0.MYSQL_';
+        var db_index = db_base.concat(boxName);
+        // var hostIn = req.params.host;
+        // // var portIn = req.params.port;
+        // var usernameIn = req.params.username;
+        // var passwordIn = req.params.password;
+        var con = mysql.createConnection({
+            host: hostIn,
+            user: "root",
+            password: "123"
+        });
+        con.connect(function(err) {
             if (err){
                 console.log(err)
-            };
-            //console.dir(list);
-            console.log(list)
-            c.end();
+                Team.findOneAndUpdate(
+                    { name: name }, 
+                    {$push: {[db_index] :{ timeStamp: epochTime , status: false, error: err} }},
+                    function(err,suc){
+                        if(err){
+                            console.log("mongodb mysql error:" + err)
+                        }
+                });
+            } else {
+                Team.findOneAndUpdate(
+                    { name: name }, 
+                    {$push: {[db_index] :{ timeStamp: epochTime , status: true} }},
+                    function(err,suc){
+                        if(err){
+                            console.log("mongodb mysql error:" + err)
+                    }
+                });
+            }
+        });
+    }
+})
+
+app.get('/AD_ALL/:teamName' , async (req, res, next) => {
+    var name = req.params.teamName;
+    var epochTime = Date.now();
+
+    for (let index = 0; index < teamIps.length; index++) {
+        var hostIn = teamIps[index];
+        const boxName = boxNames[index];
+        var db_base = 'services.0.AD_';
+        var db_index = db_base.concat(boxName);
+        var ad = new ActiveDirectory(config);
+        var username = 'test@'+ hostIn;
+        var password = 'password';
+         
+        ad.authenticate(username, password, function(err, auth) {
+          if (err) {
+            Team.findOneAndUpdate(
+                { name: name }, 
+                {$push: {[db_index] :{ timeStamp: epochTime , status: false, error : err} }},
+                function(err,suc){
+                    if(err){
+                        console.log("mongodb ad error:" + err)
+                }
+            });
+            return;
+          }
+          
+          if (auth) {
+            Team.findOneAndUpdate(
+                { name: name }, 
+                {$push: {[db_index] :{ timeStamp: epochTime , status: true} }},
+                function(err,suc){
+                    if(err){
+                        console.log("mongodb ad error:" + err)
+                }
+            });
+          }
+          else {
+            Team.findOneAndUpdate(
+                { name: name }, 
+                {$push: {[db_index] :{ timeStamp: epochTime , status: false, error : "auth failure"} }},
+                function(err,suc){
+                    if(err){
+                        console.log("mongodb ad error:" + err)
+                }
+            });
+          }
+        });
+    }
+})
+
+app.get('/FTP_ALL/:teamName' , async (req, res, next) => {
+    var name = req.params.teamName;
+    var epochTime = Date.now();
+
+    for (let index = 0; index < teamIps.length; index++) {
+        var hostIn = teamIps[index];
+        const boxName = boxNames[index];
+        var db_base = 'services.0.FTP_';
+        var db_index = db_base.concat(boxName);
+        c.connect({
+            host: hostIn,
+            port: 25,
+            user: "anonymouse",
+            password: "anonymouse"
+        });
+        c.on('ready', function() {
+            c.list(function(err, list) {
+                if (err){
+                    Team.findOneAndUpdate(
+                        { name: name }, 
+                        {$push: {[db_index] :{ timeStamp: epochTime , status: false, error: err} }},
+                        function(err,suc){
+                            if(err){
+                                console.log("mongodb ftp error:" + err)
+                            }
+                    });
+                    console.log(err)
+                } else{
+                    Team.findOneAndUpdate(
+                        { name: name }, 
+                        {$push: {[db_index] :{ timeStamp: epochTime , status: true} }},
+                        function(err,suc){
+                            if(err){
+                                console.log("mongodb ftp error:" + err)
+                        }
+                    });
+                }
+                c.end();
             });
         });
-    res.send({
-        msg: 'FTP Noise'
-    })
+    }
 })
-//shouldnt be hard
-app.get('/SQL/:host/:port/:username/:password', (req , res , next) => {
-    var hostIn = req.params.host;
-    var portIn = req.params.port;
-    var usernameIn = req.params.username;
-    var passwordIn = req.params.password;
 
-})
+//works
+// app.get('/FTP/:host/:port/:username/:password', (req , res , next) => {
+//     var hostIn = req.params.host;
+//     var portIn = req.params.port;
+//     var usernameIn = req.params.username;
+//     var passwordIn = req.params.password;
+//     var commandIn = req.params.command; //add this
+//     console.log(hostIn + " : " + portIn + " : " + usernameIn + " : " + passwordIn)
+//     c.connect({
+//         host: hostIn,
+//         port: portIn,
+//         user: usernameIn,
+//         password: passwordIn
+//     });
+//     c.on('ready', function() {
+//         c.list(function(err, list) {
+//             if (err){
+//                 console.log(err)
+//             } else{
+//                 console.log(123)
+//             }
+//             c.end();
+//             });
+//         });
+//     res.send({
+//         msg: 'FTP Noise'
+//     })
+// })
+//shouldnt be hard
+// app.get('/SQL/:host/:username/:password', (req , res , next) => {
+//     var hostIn = req.params.host;
+//     // var portIn = req.params.port;
+//     var usernameIn = req.params.username;
+//     var passwordIn = req.params.password;
+//     var con = mysql.createConnection({
+//         host: hostIn,
+//         user: usernameIn,
+//         password: passwordIn
+//     });
+//     con.connect(function(err) {
+//         if (err){
+//             res.send({
+//                 status: false,
+//                 error : err
+//             })
+//         } else {
+//             res.send({
+//                 status: true
+//             })
+//         }
+//     });
+// })
 //No clue find liam
-app.get('/AD/:host/:port/:username/:password', async (req , res , next) => {
-    var hostIn = req.params.host;
-    var portIn = req.params.port;
-    var usernameIn = req.params.username;
-    var passwordIn = req.params.password;
-    //var commandIn = req.params.command; //add this
-    var username = usernameIn;
-    var password = passwordIn;
+// app.get('/AD/:host/:port/:username/:password', async (req , res , next) => {
+//     var hostIn = req.params.host;
+//     var portIn = req.params.port;
+//     var usernameIn = req.params.username;
+//     var passwordIn = req.params.password;
+//     //var commandIn = req.params.command; //add this
+//     var username = usernameIn;
+//     var password = passwordIn;
     
-    ad.authenticate(username, password, function(err, auth) {
-    if (err) {
-        console.log('ERROR: '+JSON.stringify(err));
-        return;
-    }
+//     ad.authenticate(username, password, function(err, auth) {
+//     if (err) {
+//         console.log('ERROR: '+JSON.stringify(err));
+//         return;
+//     }
     
-    if (auth) {
-        console.log('Authenticated!');
-    }
-    else {
-        console.log('Authentication failed!');
-    }
-    });
-})  
+//     if (auth) {
+//         console.log('Authenticated!');
+//     }
+//     else {
+//         console.log('Authentication failed!');
+//     }
+//     });
+// })  
 
 app.listen(process.env.PORT || 8082)
