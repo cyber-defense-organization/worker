@@ -15,7 +15,7 @@ var sshPort = 2220;
 var teamIps = [
     '8.8.8.8',
     '8.8.8.9',
-    '8.8.8.822',
+    '8.8.8.8',
     '8.8.8.9',
     '8.8.8.8',
 ]
@@ -73,11 +73,200 @@ var db = mongodb_conn_module.connect();
 
 //dbdepends
 var Team = require("./models/team")
+var sTeam = require("./models/sTeam")
 
 //middleware if we get that far
 // const ICMP = require('./middleware/ICMP')
 
 //This will get added to admin panel on Backend
+app.get('/NaddTeam/:name' , (req,res,next) => {
+    var epochTime = Date.now();
+    var name = req.params.name;
+    var score = 0;
+    var new_entry = new sTeam({
+        name: name,
+        password: 'bb123#123',
+        score: score,
+        // ICMP_Score: Number,
+        // SSH_Score: Number,
+        // HTTP_Score: Number,
+        // DNS_Score: Number,
+        // DB_Score: Number,
+        // FTP_Score: Number,
+        AD_Linux1: {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        },
+        AD_Linux2: {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        },
+        AD_Windows1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        },
+        AD_Windows2: {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        AD_Windows98:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        // MYSQL
+        MYSQL_Linux1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        MYSQL_Linux2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        MYSQL_Windows1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        MYSQL_Windows2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        MYSQL_Windows98:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        // FTP
+        FTP_Linux1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        FTP_Linux2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        FTP_Windows1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        FTP_Windows2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        FTP_Windows98:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        //ICMP
+        ICMP_Linux1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na',
+            speed: 'na'
+        } ,
+        ICMP_Linux2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na',
+            speed: 'na'
+        } ,
+        ICMP_Windows1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na',
+            speed: 'na'
+        } ,
+        ICMP_Windows2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na',
+            speed: 'na'
+        } ,
+        ICMP_98:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na',
+            speed: 'na'
+        } ,
+
+        //SSH
+        SSH_Linux1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        SSH_Linux2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        SSH_Windows1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        SSH_Windows2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        SSH_98:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+
+        //DNS 
+        DNS_Linux1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        DNS_Linux2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        DNS_Windows1:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        DNS_Windows2:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        DNS_98:  {
+            timeStamp: epochTime,
+            status: false,
+            error: 'na'
+        } ,
+        })
+      
+      new_entry.save(function (error) {
+        if (error) {
+          console.log(error)
+        }
+        res.send({
+          success: true
+        })
+      })
+})
+
 app.get('/addTeam/:name' , (req,res,next) => {
     var epochTime = Date.now();
     var name = req.params.name;
@@ -105,8 +294,74 @@ app.get('/addTeam/:name' , (req,res,next) => {
         })
       })
 })
+
+app.get('/updateTest/:teamName' , (req,res,next) => {
+    var name = req.params.teamName;
+    var epochTime = Date.now();
+    var error = 'New Error';
+    sTeam.update({ name: name }, 
+        {'$set': {'ICMP_Linux1':{
+            timeStamp: epochTime ,
+            status: false ,
+            error: error.toString()
+        }}
+     }, function(err, affected, resp) {
+       console.log('This response: ' , resp);
+    });
+    res.send({
+        This: 'Works'
+    })
+})
 //Finished Works
 app.get('/ICMP_ALL/:teamName' , async (req, res, next) =>{
+    //var hostIn = req.params.host;
+    var name = req.params.teamName;
+    var epochTime = Date.now();
+  
+    
+    for (let index = 0; index < teamIps.length; index++) {
+        var hostIn = teamIps[index];
+        const boxName = boxNames[index];
+        var db_base = 'ICMP_';
+        var db_index = db_base.concat(boxName);
+        var result = await session.pingHost(hostIn, function (error, hostIn, sent, rcvd) {
+        var ms = rcvd - sent;
+        var db_index = db_base.concat(boxName).toString();
+            if (error){
+                var output = hostIn + ": " + error.toString()
+                sTeam.update({ name: name }, 
+                    {'$set': { [db_index] :{
+                        timeStamp: epochTime ,
+                        status: false ,
+                        error: error.toString()
+                    }}
+                 }, function(err, affected, resp) {
+                   //console.log('This response: ' , resp);
+                })
+            }
+            else{
+                var output = hostIn + ": Alive (ms=" + ms + ")"
+                sTeam.update({ name: name }, 
+                    {'$set': { [db_index] :{
+                        timeStamp: epochTime ,
+                        status: true ,
+                        speed: ms
+
+                    }}
+                 }, function(err, affected, resp) {
+                   //console.log('This response: ' , resp);
+                });
+                // res.send({
+                //     result: output
+                // })
+            }
+        });
+    }
+    res.send({
+        debug: 'This works'
+    })
+})
+app.get('/OICMP_ALL/:teamName' , async (req, res, next) =>{
     //var hostIn = req.params.host;
     var name = req.params.teamName;
     var epochTime = Date.now();
@@ -391,83 +646,6 @@ app.get('/FTP_ALL/:teamName' , async (req, res, next) => {
             });
         });
     }
-})
-
-//works
-// app.get('/FTP/:host/:port/:username/:password', (req , res , next) => {
-//     var hostIn = req.params.host;
-//     var portIn = req.params.port;
-//     var usernameIn = req.params.username;
-//     var passwordIn = req.params.password;
-//     var commandIn = req.params.command; //add this
-//     console.log(hostIn + " : " + portIn + " : " + usernameIn + " : " + passwordIn)
-//     c.connect({
-//         host: hostIn,
-//         port: portIn,
-//         user: usernameIn,
-//         password: passwordIn
-//     });
-//     c.on('ready', function() {
-//         c.list(function(err, list) {
-//             if (err){
-//                 console.log(err)
-//             } else{
-//                 console.log(123)
-//             }
-//             c.end();
-//             });
-//         });
-//     res.send({
-//         msg: 'FTP Noise'
-//     })
-// })
-//shouldnt be hard
-// app.get('/SQL/:host/:username/:password', (req , res , next) => {
-//     var hostIn = req.params.host;
-//     // var portIn = req.params.port;
-//     var usernameIn = req.params.username;
-//     var passwordIn = req.params.password;
-//     var con = mysql.createConnection({
-//         host: hostIn,
-//         user: usernameIn,
-//         password: passwordIn
-//     });
-//     con.connect(function(err) {
-//         if (err){
-//             res.send({
-//                 status: false,
-//                 error : err
-//             })
-//         } else {
-//             res.send({
-//                 status: true
-//             })
-//         }
-//     });
-// })
-//No clue find liam
-// app.get('/AD/:host/:port/:username/:password', async (req , res , next) => {
-//     var hostIn = req.params.host;
-//     var portIn = req.params.port;
-//     var usernameIn = req.params.username;
-//     var passwordIn = req.params.password;
-//     //var commandIn = req.params.command; //add this
-//     var username = usernameIn;
-//     var password = passwordIn;
-    
-//     ad.authenticate(username, password, function(err, auth) {
-//     if (err) {
-//         console.log('ERROR: '+JSON.stringify(err));
-//         return;
-//     }
-    
-//     if (auth) {
-//         console.log('Authenticated!');
-//     }
-//     else {
-//         console.log('Authentication failed!');
-//     }
-//     });
-// })  
+}) 
 
 app.listen(process.env.PORT || 8082)

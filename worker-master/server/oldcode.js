@@ -1,3 +1,80 @@
+//works
+// app.get('/FTP/:host/:port/:username/:password', (req , res , next) => {
+//     var hostIn = req.params.host;
+//     var portIn = req.params.port;
+//     var usernameIn = req.params.username;
+//     var passwordIn = req.params.password;
+//     var commandIn = req.params.command; //add this
+//     console.log(hostIn + " : " + portIn + " : " + usernameIn + " : " + passwordIn)
+//     c.connect({
+//         host: hostIn,
+//         port: portIn,
+//         user: usernameIn,
+//         password: passwordIn
+//     });
+//     c.on('ready', function() {
+//         c.list(function(err, list) {
+//             if (err){
+//                 console.log(err)
+//             } else{
+//                 console.log(123)
+//             }
+//             c.end();
+//             });
+//         });
+//     res.send({
+//         msg: 'FTP Noise'
+//     })
+// })
+//shouldnt be hard
+// app.get('/SQL/:host/:username/:password', (req , res , next) => {
+//     var hostIn = req.params.host;
+//     // var portIn = req.params.port;
+//     var usernameIn = req.params.username;
+//     var passwordIn = req.params.password;
+//     var con = mysql.createConnection({
+//         host: hostIn,
+//         user: usernameIn,
+//         password: passwordIn
+//     });
+//     con.connect(function(err) {
+//         if (err){
+//             res.send({
+//                 status: false,
+//                 error : err
+//             })
+//         } else {
+//             res.send({
+//                 status: true
+//             })
+//         }
+//     });
+// })
+//No clue find liam
+// app.get('/AD/:host/:port/:username/:password', async (req , res , next) => {
+//     var hostIn = req.params.host;
+//     var portIn = req.params.port;
+//     var usernameIn = req.params.username;
+//     var passwordIn = req.params.password;
+//     //var commandIn = req.params.command; //add this
+//     var username = usernameIn;
+//     var password = passwordIn;
+    
+//     ad.authenticate(username, password, function(err, auth) {
+//     if (err) {
+//         console.log('ERROR: '+JSON.stringify(err));
+//         return;
+//     }
+    
+//     if (auth) {
+//         console.log('Authenticated!');
+//     }
+//     else {
+//         console.log('Authentication failed!');
+//     }
+//     });
+// }) 
+
 app.get('/ICMP_ALLFixed/:teamName', async (req,res,next) => {
     var name = req.params.teamName;
     var epochTime = Date.now();
