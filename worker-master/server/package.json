@@ -23,6 +23,7 @@
     "net-ping": "^1.2.3",
     "node-ssh": "^6.0.0",
     "nodejs-winrm": "^1.1.2",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "request": "^2.88.0"
   }
 }
