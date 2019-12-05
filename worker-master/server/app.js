@@ -4,41 +4,30 @@ const cors = require('cors')
 const morgan = require('morgan')
 var Request = require("request");
 var mysql = require('mysql');
-var ActiveDirectory = require('activedirectory');
-const app = express()
+//ICMP
+var ping = require("net-ping");
 var prop = require("./db_propate")
+var ActiveDirectory = require('activedirectory');
+var dns = require('dns');
+var node_ssh = require('node-ssh')
+var ActiveDirectory = require('activedirectory');
+//dbdepends
+var Team = require("./models/team")
+var creds = require("./models/auth")
+var sTeam = require("./models/sTeam")
+
+
+const mongodb_conn_module = require('./mongodbConnModule');
+var db = mongodb_conn_module.connect();
+var ssh = new node_ssh()
+const app = express()
+var Client = require('ftp');
+var c = new Client();
+
 app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(cors())
 
-//Team IP Info
-var sshPort = 2220;
-var teamIps = [
-    '8.8.8.8',
-    '8.8.8.9',
-    '8.8.8.8',
-    '8.8.8.9',
-    '8.8.8.8',
-]
-var testSSH = [
-    'bandit.labs.overthewire.org',
-    'bandit.labs.overthewire.org',
-    'bandit.labs.overthewire.orgs',
-    'bandit.labs.overthewire.org',
-    'bandit.labs.overthewire.orgs',
-]
-var boxNames = [
-    'Linux1',
-    'Linux2',
-    'Windows1',
-    'Windows2',
-    '98',
-]
-
-//Services deps
-
-//ICMP
-var ping = require("net-ping");
 var options = {
     networkProtocol: ping.NetworkProtocol.IPv4,
     packetSize: 16,
@@ -48,39 +37,24 @@ var options = {
     ttl: 128
 };
 var session = ping.createSession(options);
-//DNS
-var dns = require('dns');
 
-//SSH
-var node_ssh = require('node-ssh')
-var ssh = new node_ssh()
-    //DB -- SQL
-    // npm install mysql
+var sshPort = 2220;
+var ftpPort = 25;
+var teamIps = [
+    '8.8.8.8',
+    '8.8.8.9',
+    '8.8.8.8',
+    '8.8.8.9',
+    '8.8.8.8',
+]
 
-//FTP
-var Client = require('ftp');
-var c = new Client();
-
-//AD (active directory) //doesnt work
-var ActiveDirectory = require('activedirectory');
-var config = {
-        url: 'ldap://dc.domain.com',
-        baseDN: 'dc=domain,dc=com',
-        username: 'username@domain.com', // might not need these
-        password: 'password'
-    } //might not need these
-var ad = new ActiveDirectory(config);
-
-const mongodb_conn_module = require('./mongodbConnModule');
-var db = mongodb_conn_module.connect();
-
-//dbdepends
-var Team = require("./models/team")
-var creds = require("./models/auth")
-var sTeam = require("./models/sTeam")
-
-//middleware if we get that far
-// const ICMP = require('./middleware/ICMP')
+var boxNames = [
+    'Linux1',
+    'Linux2',
+    'Windows1',
+    'Windows2',
+    'Windows98',
+]
 
 function insert_entry(status, name, db_index, error = false) {
     var entry = {
@@ -139,53 +113,7 @@ app.get('/NaddTeam/:name', (req, res, next) => {
     })
 })
 
-app.get('/addTeam/:name', (req, res, next) => {
-    var epochTime = Date.now();
-    var name = req.params.name;
-    var score = 0;
-    var isOnline = true;
-    var new_entry = new Team({
-        name: name,
-        score: score,
-        services: [{
-            ICMP: [{
-                timeStamp: epochTime,
-                status: isOnline
-            }],
 
-        }]
-    })
-
-    new_entry.save(function(error) {
-        if (error) {
-            console.log(error)
-        }
-        res.send({
-            success: true
-        })
-    })
-})
-
-app.get('/updateTest/:teamName', (req, res, next) => {
-        var name = req.params.teamName;
-        var epochTime = Date.now();
-        var error = 'New Error';
-        sTeam.update({ name: name }, {
-            '$set': {
-                'ICMP_Linux1': {
-                    timeStamp: epochTime,
-                    status: false,
-                    error: error.toString()
-                }
-            }
-        }, function(err, affected, resp) {
-            console.log('This response: ', resp);
-        });
-        res.send({
-            This: 'Works'
-        })
-    })
-    //Finished Works
 app.get('/ICMP_ALL/:teamName', async(req, res, next) => {
     //var hostIn = req.params.host;
     var name = req.params.teamName;
@@ -193,11 +121,8 @@ app.get('/ICMP_ALL/:teamName', async(req, res, next) => {
     for (let index = 0; index < teamIps.length; index++) {
         var hostIn = teamIps[index];
         const boxName = boxNames[index];
-        var db_base = 'ICMP_';
-        var db_index = db_base.concat(boxName);
         var result = await session.pingHost(hostIn, function(error, hostIn, sent, rcvd) {
             var ms = rcvd - sent;
-            var db_index = db_base.concat(boxName).toString();
             if (error) {
                 var db_base = 'ICMP_';
                 var db_index = db_base.concat(boxName);
@@ -217,7 +142,7 @@ app.get('/SSH_All/:teamName', async(req, res, next) => {
         var name = req.params.teamName;
         var commandIn = "whoami";
         for (let index = 0; index < teamIps.length; index++) {
-            var hostIn = testSSH[index];
+            var hostIn = teamIps[index];
             const boxName = boxNames[index];
             var db_base = 'SSH_';
             var db_index = db_base.concat(boxName).toString();
@@ -317,7 +242,7 @@ app.get('/AD_ALL/:teamName', async(req, res, next) => {
         const boxName = boxNames[index];
         var db_base = 'AD_';
         var db_index = db_base.concat(boxName);
-        var ad = new ActiveDirectory(config);
+        var ad = new ActiveDirectory();
         var creds = await get_creds(db_index, name)
         if (creds) {
             ad.authenticate(creds["username"] + "@" + hostIn, creds["password"], function(err, auth) {
@@ -351,7 +276,7 @@ app.get('/FTP_ALL/:teamName', async(req, res, next) => {
         if (creds) {
             c.connect({
                 host: hostIn,
-                port: 25,
+                port: ftpPort,
                 user: creds["username"],
                 password: creds["password"]
             });
