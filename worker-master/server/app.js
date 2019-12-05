@@ -64,7 +64,9 @@ function insert_entry(status, name, db_index, error = false) {
     if (error) {
         entry["error"] = error
     } else {
-        sTeam.update({ name: name }, {
+        sTeam.update({
+            name: name
+        }, {
             '$inc': {
                 score: 1,
                 shopScore: 1
@@ -76,7 +78,9 @@ function insert_entry(status, name, db_index, error = false) {
             //console.log('This response: ' , resp);
         });
     }
-    sTeam.update({ name: name }, {
+    sTeam.update({
+        name: name
+    }, {
         '$set': {
             [db_index]: entry
         }
@@ -89,7 +93,9 @@ function insert_entry(status, name, db_index, error = false) {
 }
 
 async function get_creds(serviceName, teamName) {
-    const foundUser = await creds.findOne({ name: teamName })
+    const foundUser = await creds.findOne({
+        name: teamName
+    })
     return foundUser[serviceName + "_Creds"]
 }
 
@@ -154,7 +160,9 @@ app.get('/SSH_All/:teamName', async(req, res, next) => {
                     port: sshPort,
                     password: creds["password"],
                 }).then(function() {
-                    ssh.execCommand(commandIn, { cwd: '' }).then(function(result) {
+                    ssh.execCommand(commandIn, {
+                        cwd: ''
+                    }).then(function(result) {
                         var db_base = 'SSH_';
                         var db_index = db_base.concat(boxName).toString();
                         insert_entry(true, name, db_index)
