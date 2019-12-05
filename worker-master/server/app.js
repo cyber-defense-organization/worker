@@ -234,7 +234,7 @@ app.get('/SQL_ALL/:teamName', async(req, res, next) => {
             con.connect(function(err) {
                 if (err) {
                     var db_index = db_base.concat(boxName);
-                    insert_entry(false, name, db_index, error.toString())
+                    insert_entry(false, name, db_index, err.toString())
                 } else {
                     var db_index = db_base.concat(boxName);
                     insert_entry(true, name, db_index)
