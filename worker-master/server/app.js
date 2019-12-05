@@ -5,7 +5,9 @@ const morgan = require('morgan')
 var Request = require("request");
 var mysql = require('mysql');
 //ICMP
+//var request = require('request');
 var ping = require("net-ping");
+const axios = require('axios');
 var prop = require("./db_propate")
 var ActiveDirectory = require('activedirectory');
 var dns = require('dns');
@@ -40,6 +42,7 @@ var session = ping.createSession(options);
 
 var sshPort = 2220;
 var ftpPort = 25;
+var httpPort
 var teamIps = [
     '8.8.8.8',
     '8.8.8.9',
@@ -270,6 +273,38 @@ app.get('/AD_ALL/:teamName', async(req, res, next) => {
         }
     }
 })
+
+app.get('/WEB_ALL/:teamName', async(req, res, next) => {
+    var name = req.params.teamName;
+    var epochTime = Date.now();
+
+    for (let index = 0; index < teamIps.length; index++) {
+        var hostIn = teamIps[index];
+        const boxName = boxNames[index];
+        var db_base = 'Web_';
+        var db_index = db_base.concat(boxName);
+        //axios.get("http://" + hostIn + ":" + httpPort, timeout=10)
+        axios({
+            method: 'get',
+            url : "http://" + hostIn + ":" + httpPort,
+            timeout: 5000
+        })
+        .then(response => {
+            var db_index = db_base.concat(boxName);
+            if(response.data.explanation.toLowerCase().search("connection")) {
+                insert_entry(true, name, db_index)
+                console.log(response.data.explanation)
+            } else {
+                insert_entry(false, name, db_index, "unable to find string")
+            }
+        })
+        .catch(err => {
+            var db_index = db_base.concat(boxName);
+            insert_entry(false, name, db_index, err.toString())
+        });
+    }
+})
+
 
 app.get('/FTP_ALL/:teamName', async(req, res, next) => {
     var name = req.params.teamName;

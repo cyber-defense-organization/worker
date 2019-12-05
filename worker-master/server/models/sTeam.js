@@ -12,6 +12,31 @@ var sTeamSchema = new Schema({
     // DNS_Score: Number,
     // DB_Score: Number,
     // FTP_Score: Number,
+    Web_Linux1: {
+        timeStamp: { type: Date },
+        status: { type: Boolean, default: false },
+        error: String
+    },
+    Web_Linux2: {
+        timeStamp: { type: Date },
+        status: { type: Boolean, default: false },
+        error: String
+    },
+    Web_Windows1: {
+        timeStamp: { type: Date },
+        status: { type: Boolean, default: false },
+        error: String
+    },
+    Web_Windows2: {
+        timeStamp: { type: Date },
+        status: { type: Boolean, default: false },
+        error: String
+    },
+    Web_Windows98: {
+        timeStamp: { type: Date },
+        status: { type: Boolean, default: false },
+        error: String
+    },
     AD_Linux1: {
         timeStamp: { type: Date },
         status: { type: Boolean, default: false },

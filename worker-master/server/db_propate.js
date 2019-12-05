@@ -199,6 +199,31 @@ module.exports = {
                 status: false,
                 error: 'na'
             },
+            Web_Linux1: {
+                timeStamp: epochTime,
+                status: false,
+                error: 'na'
+            },
+            Web_Linux2: {
+                timeStamp: epochTime,
+                status: false,
+                error: 'na'
+            },
+            Web_Windows1: {
+                timeStamp: epochTime,
+                status: false,
+                error: 'na'
+            },
+            Web_Windows2: {
+                timeStamp: epochTime,
+                status: false,
+                error: 'na'
+            },
+            Web_Windows98: {
+                timeStamp: epochTime,
+                status: false,
+                error: 'na'
+            },
             // MYSQL
             MYSQL_Linux1: {
                 timeStamp: epochTime,
