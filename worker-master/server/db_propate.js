@@ -2,7 +2,7 @@ var epochTime = Date.now();
 var score = 0;
 
 
-var default_user = "cdo";
+var default_user = "scoringengine";
 var default_password = "bb123#123"
 
 module.exports = {
