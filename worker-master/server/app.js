@@ -205,6 +205,9 @@ app.get('/DNS_ALL/:teamName', async(req, res, next) => {
                 insert_entry(true, name, db_index)
             }
         });
+        res.send({
+            msg: 'DNS works'
+        })
     }
     res.send({
         msg: 'DNS works'
@@ -242,6 +245,9 @@ app.get('/SQL_ALL/:teamName', async(req, res, next) => {
             });
         }
     }
+    res.send({
+        msg: 'SQL works'
+    })
 })
 
 app.get('/AD_ALL/:teamName', async(req, res, next) => {
@@ -272,6 +278,9 @@ app.get('/AD_ALL/:teamName', async(req, res, next) => {
             });
         }
     }
+    res.send({
+        msg: 'AD works'
+    })
 })
 
 app.get('/WEB_ALL/:teamName', async(req, res, next) => {
@@ -303,6 +312,9 @@ app.get('/WEB_ALL/:teamName', async(req, res, next) => {
             insert_entry(false, name, db_index, err.toString())
         });
     }
+    res.send({
+        msg: 'Web works'
+    })
 })
 
 
@@ -337,6 +349,9 @@ app.get('/FTP_ALL/:teamName', async(req, res, next) => {
             });
         }
     }
+    res.send({
+        msg: 'FTP works'
+    })
 })
 
 app.listen(process.env.PORT || 8082)
