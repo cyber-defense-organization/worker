@@ -50,7 +50,7 @@ var options = {
 };
 var session = ping.createSession(options);
 
-var sshPort = 2220;
+var sshPort = 22;
 var ftpPort = 25;
 var httpPort = 80
 var boxNames = [
@@ -154,7 +154,6 @@ app.get('/ICMP_ALL/:teamName', async(req, res, next) => {
 
 app.get('/SSH_All/:teamName', async(req, res, next) => {
         var name = req.params.teamName;
-        var commandIn = "whoami";
         for (let index = 0; index < teamIps.length; index++) {
             var hostIn = teamIps[index];
             const boxName = boxNames[index];
@@ -168,13 +167,9 @@ app.get('/SSH_All/:teamName', async(req, res, next) => {
                     port: sshPort,
                     password: creds["password"],
                 }).then(function() {
-                    ssh.execCommand(commandIn, {
-                        cwd: ''
-                    }).then(function(result) {
-                        var db_base = 'SSH_';
-                        var db_index = db_base.concat(boxName).toString();
-                        insert_entry(true, name, db_index)
-                    })
+                    var db_base = 'SSH_';
+                    var db_index = db_base.concat(boxName).toString();
+                    insert_entry(true, name, db_index)
                 }).catch(function(error) {
                     var db_base = 'SSH_';
                     var db_index = db_base.concat(boxName).toString();
