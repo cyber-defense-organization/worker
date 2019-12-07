@@ -294,7 +294,7 @@ app.get('/WEB_ALL/:teamName', async(req, res, next) => {
         //axios.get("http://" + hostIn + ":" + httpPort, timeout=10)
         axios({
             method: 'get',
-            url : "http://" + hostIn + ":" + httpPort,
+            url : "http://" + hostIn + ":" + httpPort + "/gddc/index.php",
             timeout: 5000
         })
         .then(response => {
