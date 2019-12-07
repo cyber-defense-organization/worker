@@ -298,13 +298,8 @@ app.get('/WEB_ALL/:teamName', async(req, res, next) => {
             timeout: 5000
         })
         .then(response => {
-            var db_index = db_base.concat(boxName);
-            if(response.data.explanation.toLowerCase().search("connection")) {
-                insert_entry(true, name, db_index)
-                console.log(response.data.explanation)
-            } else {
-                insert_entry(false, name, db_index, "unable to find string")
-            }
+            insert_entry(true, name, db_index)
+            console.log(response.data.explanation)
         })
         .catch(err => {
             var db_index = db_base.concat(boxName);
