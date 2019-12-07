@@ -51,6 +51,8 @@ var teamIps = [
     '8.8.8.8',
 ]
 
+var listenPort = 8082
+
 var boxNames = [
     'Linux1',
     'Linux2',
@@ -145,6 +147,9 @@ app.get('/ICMP_ALL/:teamName', async(req, res, next) => {
             }
         });
     }
+    res.send({
+        success: true
+    })
 })
 
 app.get('/SSH_All/:teamName', async(req, res, next) => {
@@ -202,12 +207,10 @@ app.get('/DNS_ALL/:teamName', async(req, res, next) => {
             } else {
                 var db_base = 'DNS_';
                 var db_index = db_base.concat(boxName);
+               // console.log('address: %j family: IPv%s', addresses, family);
                 insert_entry(true, name, db_index)
             }
         });
-        res.send({
-            msg: 'DNS works'
-        })
     }
     res.send({
         msg: 'DNS works'
@@ -262,7 +265,7 @@ app.get('/AD_ALL/:teamName', async(req, res, next) => {
         var ad = new ActiveDirectory();
         var creds = await get_creds(db_index, name)
         if (creds) {
-            ad.authenticate(creds["username"] + "@" + hostIn, creds["password"], function(err, auth) {
+            ad.authenticate(creds["username"] + "@dotcom.local", creds["password"], function(err, auth) {
                 if (err) {
                     var db_index = db_base.concat(boxName);
                     insert_entry(false, name, db_index, err.toString())
@@ -354,4 +357,4 @@ app.get('/FTP_ALL/:teamName', async(req, res, next) => {
     })
 })
 
-app.listen(process.env.PORT || 8082)
+app.listen(process.env.PORT || listenPort)
