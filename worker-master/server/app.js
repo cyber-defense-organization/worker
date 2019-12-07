@@ -1,3 +1,13 @@
+var teamIp = "10.0.11."
+var listenPort = 8082
+
+var teamIps = []
+
+for(i =1; i < 6; i++) {
+  var end_octet = i + "0"
+  teamIps.push(teamIp + end_octet)
+}
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
@@ -42,17 +52,7 @@ var session = ping.createSession(options);
 
 var sshPort = 2220;
 var ftpPort = 25;
-var httpPort
-var teamIps = [
-    '8.8.8.8',
-    '8.8.8.9',
-    '8.8.8.8',
-    '8.8.8.9',
-    '8.8.8.8',
-]
-
-var listenPort = 8082
-
+var httpPort = 80
 var boxNames = [
     'Linux1',
     'Linux2',
