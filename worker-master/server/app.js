@@ -154,7 +154,7 @@ app.get('/ICMP_ALL/:teamName', async(req, res, next) => {
 
 app.get('/SSH_All/:teamName', async(req, res, next) => {
         var name = req.params.teamName;
-        for (let index = 0; index < teamIps.length; index++) {
+        for (let index = 0; index < 2; index++) {
             var hostIn = teamIps[index];
             const boxName = boxNames[index];
             var db_base = 'SSH_';
@@ -186,7 +186,7 @@ app.get('/SSH_All/:teamName', async(req, res, next) => {
 app.get('/DNS_ALL/:teamName', async(req, res, next) => {
     var name = req.params.teamName;
     var epochTime = Date.now();
-    for (let index = 0; index < teamIps.length; index++) {
+    for (let index = 2; index < 3; index++) {
         var hostIn = teamIps[index];
         const boxName = boxNames[index];
         var db_base = 'DNS_';
@@ -217,7 +217,7 @@ app.get('/SQL_ALL/:teamName', async(req, res, next) => {
     var name = req.params.teamName;
     var epochTime = Date.now();
 
-    for (let index = 0; index < teamIps.length; index++) {
+    for (let index = 1; index < 2; index++) {
         var hostIn = teamIps[index];
         const boxName = boxNames[index];
         var db_base = 'MYSQL_';
@@ -286,7 +286,7 @@ app.get('/WEB_ALL/:teamName', async(req, res, next) => {
     var name = req.params.teamName;
     var epochTime = Date.now();
 
-    for (let index = 0; index < teamIps.length; index++) {
+    for (let index = 0; index < 1; index++)  {
         var hostIn = teamIps[index];
         const boxName = boxNames[index];
         var db_base = 'Web_';
