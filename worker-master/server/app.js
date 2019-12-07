@@ -199,7 +199,7 @@ app.get('/DNS_ALL/:teamName', async(req, res, next) => {
         dns.setServers([
             hostIn
         ]);
-        dns.lookup(hostIn, function onLookup(err, addresses, family) {
+        dns.lookup("google.com", function onLookup(err, addresses, family) {
             if (err) {
                 var db_base = 'DNS_';
                 var db_index = db_base.concat(boxName);
@@ -207,7 +207,7 @@ app.get('/DNS_ALL/:teamName', async(req, res, next) => {
             } else {
                 var db_base = 'DNS_';
                 var db_index = db_base.concat(boxName);
-               // console.log('address: %j family: IPv%s', addresses, family);
+                console.log('address: %j family: IPv%s', addresses, family);
                 insert_entry(true, name, db_index)
             }
         });
