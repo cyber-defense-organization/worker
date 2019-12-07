@@ -3,7 +3,7 @@ var listenPort = 8084
 
 var teamIps = []
 
-for(i =1; i < 6; i++) {
+for(i =1; i < 5; i++) {
   var end_octet = i + "0"
   teamIps.push(teamIp + end_octet)
 }
@@ -73,8 +73,8 @@ function insert_entry(status, name, db_index, error = false) {
             name: name
         }, {
             '$inc': {
-                score: 1,
-                shopScore: 1
+                score: .8,
+                shopScore: .8
             }
         }, function(err, affected, resp) {
             if (err) {
