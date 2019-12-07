@@ -1,5 +1,5 @@
-var teamIp = "10.0.11."
-var listenPort = 8082
+var teamIp = "10.0.3."
+var listenPort = 8084
 
 var teamIps = []
 
@@ -194,11 +194,12 @@ app.get('/DNS_ALL/:teamName', async(req, res, next) => {
         dns.setServers([
             hostIn
         ]);
-        dns.lookup("google.com", function onLookup(err, addresses, family) {
+	//console.log(dns.getServers())
+        dns.resolve("google.com", function onLookup(err, addresses, family) {
             if (err) {
                 var db_base = 'DNS_';
                 var db_index = db_base.concat(boxName);
-                insert_entry(false, name, db_index, error.toString())
+                insert_entry(false, name, db_index, err.toString())
             } else {
                 var db_base = 'DNS_';
                 var db_index = db_base.concat(boxName);
